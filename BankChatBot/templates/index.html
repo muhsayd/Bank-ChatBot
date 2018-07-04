@@ -208,7 +208,7 @@
                         if (data.question != null && data.question != undefined) {
                             $('#chat_hist').append("<div class='row'><div style='float: left; background-color: #efefef; padding: 15px; border-radius: 5px;'>" + data.question + "</div></div><br />");
 
-                            if (data.chart_type == '')
+                            if (data.answer != '')
                                 $('#chat_hist').append("<div class='row'><div style='float: right; background-color: #a5d175; padding: 15px; border-radius: 5px;'>" + data.answer + "</div></div><br />");
 
                             if (data.chart_type == 'bar') {
@@ -227,10 +227,7 @@
                             }
 
                             $('#chat_hist').animate({ scrollTop: $('#chat_hist').prop("scrollHeight") }, 500);
-
                             //$('#question').val('');
-
-                            draw_donut_chart(data.unique_id, data.data, data.chart_title);
                         }
                     },
                     error: (xhr, status, error) => {
