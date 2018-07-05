@@ -1,0 +1,12 @@
+Description,Date,Debit,Credit,Balance
+Opening Balance,01/01/2018,0.0,0.0,19000.0
+Transfer from Checking Account,05/01/2018,0.0,3000.0,22000.0
+Transfer to Checking Account,13/01/2018,4000.0,0.0,18000.0
+Transfer from Checking Account,26/01/2018,0.0,1500.0,19500.0
+Transfer to Checking Account,12/02/2018,2500.0,0.0,17000.0
+Transfer to Checking Account,02/02/2018,4000.0,0.0,13000.0
+Transfer from Checking Account,05/03/2018,0.0,1000.0,14000.0
+Transfer from Checking Account,22/03/2018,0.0,2000.0,16000.0
+Transfer from Checking Account,28/03/2018,0.0,3000.0,19000.0
+Transfer to Checking Account,04/04/2018,4000.0,0.0,15000.0
+Transfer from Checking Account,21/04/2018,0.0,3000.0,18000.0

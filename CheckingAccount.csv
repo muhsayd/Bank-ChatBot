@@ -1,0 +1,41 @@
+Description,Date,Debit,Credit,Balance
+Opening Balance,01/01/2018,0.0,0.0,8000.0
+Salary Deposit,02/01/2018,0.0,6000.0,14000.0
+Home Rent,03/01/2018,2000.0,0.0,12000.0
+Market Purchasing,04/01/2018,1000.0,0.0,11000.0
+Car Parking,05/01/2018,200.0,0.0,10800.0
+Hospital and Medicine,10/01/2018,80.0,0.0,10720.0
+Coffee and food from Starbucks,14/01/2018,90.5,0.0,10629.5
+Gas expenses,20/01/2018,321.8,0.0,10307.7
+Water expenses,20/01/2018,120.0,0.0,10187.7
+Electricity expenses,20/01/2018,309.5,0.0,9878.2
+Internet expenses,20/01/2018,150.45,0.0,9727.75
+loans and advances to Hydel,26/01/2018,1000.0,0.0,8727.75
+Salary Deposit,01/02/2018,0.0,6000.0,14727.75
+Home Rent,02/02/2018,2000.0,0.0,12727.75
+Super market purchasing,02/02/2018,1000.0,0.0,11727.75
+Fixing Car issues,01/02/2018,550.0,0.0,11177.75
+Food and drinks from park,04/02/2018,90.0,0.0,11087.75
+Gas expenses,09/02/2018,340.0,0.0,10747.75
+Water expenses,11/02/2018,120.0,0.0,10627.75
+Electricity expenses,18/02/2018,60.0,0.0,10567.75
+Internet expenses,23/02/2018,150.0,0.0,10417.75
+loans and advances to Hydel,27/02/2018,1100.0,0.0,9317.75
+Salary Deposit,01/03/2018,0.0,6000.0,15317.75
+Home Rent,01/03/2018,2000.0,0.0,13317.75
+Super market purchasing,01/03/2018,1000.0,0.0,12317.75
+Food and drinks from park,01/03/2018,237.38,0.0,12080.37
+Gas expenses,09/03/2018,600.0,0.0,11480.37
+Water expenses,11/03/2018,120.0,0.0,11360.37
+Electricity expenses,18/03/2018,800.0,0.0,10560.37
+Internet expenses,23/03/2018,150.0,0.0,10410.37
+loans and advances to Hydel,27/03/2018,1300.0,0.0,9110.37
+Salary Deposit,01/04/2018,0.0,6000.0,15110.37
+Home Rent,05/04/2018,2000.0,0.0,13110.37
+Super market purchasing,08/04/2018,1000.0,0.0,12110.37
+Foods from shopping mall,13/04/2018,122.2,0.0,11988.17
+Gas expenses,18/04/2018,402.0,0.0,11586.17
+Electricity expenses,20/04/2018,150.0,0.0,11436.17
+Internet expenses,24/04/2018,120.0,0.0,11316.17
+loans and advances to Hydel,30/04/2018,900.0,0.0,10416.17
+Car Fuel,30/04/2018,416.17,0.0,10000.0
