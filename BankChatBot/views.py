@@ -42,8 +42,8 @@ similarity_threshold = 0.6
 @app.route("/")
 @app.route("/home")
 def home():
-    with open("bag_of_intents.json", "r") as f:
-        intents.bag_of_intents = json.load(f)
+    #with open("bag_of_intents.json", "r") as f:
+    #    intents.bag_of_intents = json.load(f)
 
     #f = open("bag_of_intents.json", "r")
     #intents.bag_of_intents = json.load(f)
