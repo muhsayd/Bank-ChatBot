@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from flask import render_template, request, jsonify, redirect, url_for
 
 from datetime import datetime
@@ -6,6 +8,10 @@ from dateutil import parser
 from BankChatBot import app
 from BankChatBot import intents
 
+import os
+import json
+import operator
+import re
 import random
 import csv
     
@@ -13,22 +19,22 @@ import csv
 # Reading Checking Account from external csv
 CheckingAccount = []
 with open('CheckingAccount.csv') as f:
-    CheckingAccount = [{k: str(v) if k == 'Description' or k == 'Date' else float(v) for k, v in row.items()} for row in csv.DictReader(f, skipinitialspace=True)]
+    CheckingAccount = [{k: str(v) if k == u'Description' or k == u'Date' else float(v) for k, v in row.items()} for row in csv.DictReader(f, skipinitialspace=True)]
 
 
 # Reading Savings Account from external csv
 SavingsAccount = []
 with open('SavingsAccount.csv') as f:
-    SavingsAccount = [{k: str(v) if k == 'Description' or k == 'Date' else float(v) for k, v in row.items()} for row in csv.DictReader(f, skipinitialspace=True)]
+    SavingsAccount = [{k: str(v) if k == u'Description' or k == u'Date' else float(v) for k, v in row.items()} for row in csv.DictReader(f, skipinitialspace=True)]
 
-DefaultCurrency = 'Dirhams'
+DefaultCurrency = u'Dirhams'
 DefaultRate = 1.0
 
-CurrencyRates = [{ 'name': 'Dirhams', 'name_ar': 'درهم', 'value': 1.0 },
-                 { 'name': 'Dollars', 'name_ar': 'دولار', 'value': 0.27 },
-                 { 'name': 'Euro', 'name_ar': 'يورو', 'value': 0.23 }]
+CurrencyRates = [{ u'name': u'Dirhams', u'name_ar': u'درهم', u'value': 1.0 },
+                 { u'name': u'Dollars', u'name_ar': u'دولار', u'value': 0.27 },
+                 { u'name': u'Euro', u'name_ar': u'يورو', u'value': 0.23 }]
 
-Months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+Months = [u'January', u'February', u'March', u'April', u'May', u'June', u'July', u'August', u'September', u'October', u'November', u'December']
 questions_list = []
 answers_list = []
 similarity_threshold = 0.6
@@ -36,6 +42,24 @@ similarity_threshold = 0.6
 @app.route('/')
 @app.route('/home')
 def home():
+    with open('bag_of_intents.json', 'r') as f:
+        intents.bag_of_intents = json.load(f)
+
+    #f = open('bag_of_intents.json', 'r')
+    #intents.bag_of_intents = json.load(f)
+    #keys = f.read()
+    #print(str(keys))
+    #keys = keys.decode('utf-8')
+    #intents.bag_of_intents = json.loads(keys)
+    #f.close()
+
+    #if os.path.isfile('bag_of_intents.json'):
+    #    os.remove('bag_of_intents.json')
+
+    #f = open('bag_of_intents.json','w')
+    #json.dump(intents.bag_of_intents, f, ensure_ascii=False)
+    #f.close()
+
     return render_template('index.html',
         title='Home Page',
         year=datetime.now().year)
@@ -51,7 +75,8 @@ def statement():
 @app.route('/process_question', methods=['POST'])
 def process_question():
     question = request.args.get('question')
-    
+    question.encode("utf-8")
+
     answer = ''
     chart_type = ''
     expected_questions = ''
@@ -59,20 +84,20 @@ def process_question():
     chart_title = ''
     tooltip = ''
 
-    bad_question = ["I didn't get that. Can you say it again?", "Sorry, can you tell me again?", "Sorry, can you say that again?", 
-                    "I'm afraid I don't understand."]
-    bad_question_ar = ['عفواً, لم أفهم سيادتكم', 'آسف هل يمكنك السؤال مرة أخرى', 'لم أفهم السؤال سيدي', 'أخشى أني لم أفهم حضرتكم']
+    bad_question = [u"I didn't get that. Can you say it again?", u"Sorry, can you tell me again?", u"Sorry, can you say that again?", 
+                    u"I'm afraid I don't understand."]
+    bad_question_ar = [u'عفواً, لم أفهم سيادتكم', u'آسف هل يمكنك السؤال مرة أخرى', u'لم أفهم السؤال سيدي', u'أخشى أني لم أفهم حضرتكم']
 
     # Very long question or not English one => bad question
     if len(question) > 70:
         answer = bad_question[random.randint(0, len(bad_question) - 1)] if not intents.is_arabic(question) else bad_question_ar[random.randint(0, len(bad_question_ar) - 1)]
-        return jsonify(question=question, answer=answer)
+        return jsonify(question=question, answer=answer, similarity='')
 
     # print dynamic answer
     similarity = intents.get_all_similarity(question)
     if similarity[0]['value'] < similarity_threshold:
         answer = bad_question[random.randint(0, len(bad_question) - 1)] if not intents.is_arabic(question) else bad_question_ar[random.randint(0, len(bad_question_ar) - 1)]
-        return jsonify(question=question, answer=answer)
+        return jsonify(question=question, answer=answer, similarity=similarity)
 
     for intt in intents.bag_of_intents:
         if intt['intent'] == similarity[0]['intent']:
@@ -86,42 +111,42 @@ def process_question():
     global DefaultRate
 
     # Change Default Currency
-    if question.lower().find('dollar') >= 0 or question.find('دولار') >= 0:
-        DefaultCurrency = 'Dollars' if not intents.is_arabic(question) else 'دولار'
-    elif question.lower().find('euro') >= 0 or question.find('يورو') >= 0:
-        DefaultCurrency = 'Euro' if not intents.is_arabic(question) else 'يورو'
-    elif question.lower().find('dirham') >= 0 or question.find('درهم') >= 0:
-        DefaultCurrency = 'Dirhams' if not intents.is_arabic(question) else 'درهم'
+    if question.lower().find(u'dollar') >= 0 or question.find(u'دولار') >= 0:
+        DefaultCurrency = u'Dollars' if not intents.is_arabic(question) else u'دولار'
+    elif question.lower().find(u'euro') >= 0 or question.find(u'يورو') >= 0:
+        DefaultCurrency = u'Euro' if not intents.is_arabic(question) else u'يورو'
+    elif question.lower().find(u'dirham') >= 0 or question.find(u'درهم') >= 0:
+        DefaultCurrency = u'Dirhams' if not intents.is_arabic(question) else u'درهم'
 
     for cur in CurrencyRates:
         if DefaultCurrency == cur['name'] or DefaultCurrency == cur['name_ar']:
             DefaultRate = cur['value']
 
-    if intents.is_arabic(question) and DefaultCurrency == 'Dirhams':
-        DefaultCurrency = 'درهم'
-    elif not intents.is_arabic(question) and DefaultCurrency == 'درهم':
-        DefaultCurrency = 'Dirhams'
+    if intents.is_arabic(question) and DefaultCurrency == u'Dirhams':
+        DefaultCurrency = u'درهم'
+    elif not intents.is_arabic(question) and DefaultCurrency == u'درهم':
+        DefaultCurrency = u'Dirhams'
 
-    if intents.is_arabic(question) and DefaultCurrency == 'Dollars':
-        DefaultCurrency = 'دولار'
-    elif not intents.is_arabic(question) and DefaultCurrency == 'دولار':
-        DefaultCurrency = 'Dollars'
+    if intents.is_arabic(question) and DefaultCurrency == u'Dollars':
+        DefaultCurrency = u'دولار'
+    elif not intents.is_arabic(question) and DefaultCurrency == u'دولار':
+        DefaultCurrency = u'Dollars'
 
-    if intents.is_arabic(question) and DefaultCurrency == 'Euro':
-        DefaultCurrency = 'يورو'
-    elif not intents.is_arabic(question) and DefaultCurrency == 'يورو':
-        DefaultCurrency = 'Euro'
+    if intents.is_arabic(question) and DefaultCurrency == u'Euro':
+        DefaultCurrency = u'يورو'
+    elif not intents.is_arabic(question) and DefaultCurrency == u'يورو':
+        DefaultCurrency = u'Euro'
 
     # print Checking Account
-    if similarity[0]['intent'] == 'balance_checking_account':
+    if similarity[0]['intent'] == u'balance_checking_account':
         answer += str(round(CheckingAccount[len(CheckingAccount) - 1]['Balance'] * DefaultRate, 2)) + ' ' + DefaultCurrency
     
     # print Savings Account
-    if similarity[0]['intent'] == 'balance_savings_account':
+    if similarity[0]['intent'] == u'balance_savings_account':
         answer += str(round(SavingsAccount[len(SavingsAccount) - 1]['Balance'] * DefaultRate, 2)) + ' ' + DefaultCurrency
 
     # print expenses
-    if similarity[0]['intent'] == 'expenses':
+    if similarity[0]['intent'] == u'expenses':
         monthly = 0.0
         total = 0.0
         startmonth = 1
@@ -131,24 +156,24 @@ def process_question():
                 startmonth = parser.parse(stat['Date'], dayfirst=True).month
                 monthly = 0.0
 
-            if stat['Description'].find('expense') >= 0:
+            if stat['Description'].find(u'expense') >= 0:
                 total += stat['Debit']
                 monthly += stat['Debit']
 
         data.append({'name': Months[startmonth - 1], 'count': round(monthly * DefaultRate, 2)})
         answer += str(round(total * DefaultRate, 2)) + ' ' + DefaultCurrency
 
-        chart_title = 'Total Expenses'
+        chart_title = u'Total Expenses'
         tooltip = DefaultCurrency
-        if question.find('bar') >= 0:
-            chart_type = 'bar'
-        elif question.find('pie') >= 0:
-            chart_type = 'pie'
-        elif question.find('donut') >= 0:
-            chart_type = 'donut'
+        if question.find(u'bar') >= 0:
+            chart_type = u'bar'
+        elif question.find(u'pie') >= 0:
+            chart_type = u'pie'
+        elif question.find(u'donut') >= 0:
+            chart_type = u'donut'
 
     # print loans
-    if similarity[0]['intent'] == 'loans':
+    if similarity[0]['intent'] == u'loans':
         monthly = 0.0
         total = 0.0
         startmonth = 1
@@ -158,24 +183,24 @@ def process_question():
                 startmonth = parser.parse(stat['Date'], dayfirst=True).month
                 monthly = 0.0
 
-            if stat['Description'].find('loans') >= 0:
+            if stat['Description'].find(u'loans') >= 0:
                 total += stat['Debit']
                 monthly += stat['Debit']
 
         data.append({'name': Months[startmonth - 1], 'count': round(monthly * DefaultRate, 2)})
         answer += str(round(total * DefaultRate, 2)) + ' ' + DefaultCurrency
 
-        chart_title = 'Total Loans'
+        chart_title = u'Total Loans'
         tooltip = DefaultCurrency
-        if question.find('bar') >= 0:
-            chart_type = 'bar'
-        elif question.find('pie') >= 0:
-            chart_type = 'pie'
-        elif question.find('donut') >= 0:
-            chart_type = 'donut'
+        if question.find(u'bar') >= 0:
+            chart_type = u'bar'
+        elif question.find(u'pie') >= 0:
+            chart_type = u'pie'
+        elif question.find(u'donut') >= 0:
+            chart_type = u'donut'
 
     # print car
-    if similarity[0]['intent'] == 'car':
+    if similarity[0]['intent'] == u'car':
         monthly = 0.0
         total = 0.0
         startmonth = 1
@@ -185,24 +210,24 @@ def process_question():
                 startmonth = parser.parse(stat['Date'], dayfirst=True).month
                 monthly = 0.0
 
-            if stat['Description'].lower().find('car') >= 0:
+            if stat['Description'].lower().find(u'car') >= 0:
                 total += stat['Debit']
                 monthly += stat['Debit']
 
         data.append({'name': Months[startmonth - 1], 'count': round(monthly * DefaultRate, 2)})
         answer += str(round(total * DefaultRate, 2)) + ' ' + DefaultCurrency
 
-        chart_title = 'Car Expenditure'
+        chart_title = u'Car Expenditure'
         tooltip = DefaultCurrency
-        if question.find('bar') >= 0:
-            chart_type = 'bar'
-        elif question.find('pie') >= 0:
-            chart_type = 'pie'
-        elif question.find('donut') >= 0:
-            chart_type = 'donut'
+        if question.find(u'bar') >= 0:
+            chart_type = u'bar'
+        elif question.find(u'pie') >= 0:
+            chart_type = u'pie'
+        elif question.find(u'donut') >= 0:
+            chart_type = u'donut'
 
     # print food
-    if similarity[0]['intent'] == 'food':
+    if similarity[0]['intent'] == u'food':
         monthly = 0.0
         total = 0.0
         startmonth = 1
@@ -212,21 +237,21 @@ def process_question():
                 startmonth = parser.parse(stat['Date'], dayfirst=True).month
                 monthly = 0.0
 
-            if stat['Description'].lower().find('food') >= 0:
+            if stat['Description'].lower().find(u'food') >= 0:
                 total += stat['Debit']
                 monthly += stat['Debit']
 
         data.append({'name': Months[startmonth - 1], 'count': round(monthly * DefaultRate, 2)})
         answer += str(round(total * DefaultRate, 2)) + ' ' + DefaultCurrency
 
-        chart_title = 'Food Expenditure'
+        chart_title = u'Food Expenditure'
         tooltip = DefaultCurrency
-        if question.find('bar') >= 0:
-            chart_type = 'bar'
-        elif question.find('pie') >= 0:
-            chart_type = 'pie'
-        elif question.find('donut') >= 0:
-            chart_type = 'donut'
+        if question.find(u'bar') >= 0:
+            chart_type = u'bar'
+        elif question.find(u'pie') >= 0:
+            chart_type = u'pie'
+        elif question.find(u'donut') >= 0:
+            chart_type = u'donut'
             
     questions_list.append(question)
     answers_list.append(answer)
@@ -237,5 +262,6 @@ def process_question():
                    chart_title=chart_title,
                    tooltip=tooltip,
                    chart_type=chart_type,
-                   answer=answer)
+                   answer=answer,
+                   similarity=similarity)
     

@@ -206,6 +206,8 @@
                     url: '/process_question?question=' + $('#question').val(),
                     success: (data, status, xhr) => {
                         if (data.question != null && data.question != undefined) {
+                            console.log(data.similarity);
+
                             $('#chat_hist').append("<div class='row'><div style='float: left; background-color: #efefef; padding: 15px; border-radius: 5px;'>" + data.question + "</div></div><br />");
 
                             if (data.answer != '')

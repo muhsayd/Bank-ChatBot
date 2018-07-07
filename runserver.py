@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 This script runs the BankChatBot application using a development server.
 """
