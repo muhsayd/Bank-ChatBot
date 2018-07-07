@@ -72,7 +72,7 @@ bag_of_intents = [{
                       u"intent": u"loans",
                       u"values": [u"how much loans", u"show my loans", u"my loans", u"what's my loans", u"show loans", u"check my loans"],
                       u"keywords": [u"loan", u"loans"],
-                      u"keywords_ar": [u"قسط", u"أقساط", u"أقساطي", u"اقساطي", u"اقساطي", u"إجمالي", u"اجمالي", u"إجمالى", u"اجمالى", u"مجموع", u"دولار", u"يورو", u"درهم"],
+                      u"keywords_ar": [u"قسط", u"القسط", u"أقساط", u"الأقساط", u"الاقساط", u"الإقساط", u"أقساطي", u"اقساطي", u"اقساطي", u"إجمالي", u"اجمالي", u"إجمالى", u"اجمالى", u"مجموع", u"دولار", u"يورو", u"درهم"],
                       u"answers": [u"your total loans is: "],
                       u"answers_ar": [u"إجمالي أقساطك هي: "]
                    },

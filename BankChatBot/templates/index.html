@@ -247,6 +247,13 @@
     <div class="row">
         <div id="chat_hist" class="col-md-8" style="overflow-y: scroll; height: 550px;">
         </div>
+        <div class="col-md-4" style="overflow-y: scroll; height: 550px;">
+            <h4><b>Example questions to Chatbot:</b></h4>
+            {% for s in sample %}
+                <span>{{ s }}</span>
+                <br />
+            {% endfor %}
+        </div>
     </div>
     <div class="row">
         <div class="col-md-8">
